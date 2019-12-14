@@ -1,0 +1,16 @@
+#Students	Noam Simon	Chen Eliyahou	208388850	312490675
+#Output1	dataset/develop.txt
+#Output2	dataset/test.text
+#Output3	honduras
+#Output4	output.txt
+#Output5	300000
+#Output6	7.2263385587790374e-06
+#Output7	415148
+#Output8	41515
+#Output9	373633
+#Output10	18976
+#Output11	3
+#Output12	8.029269363252175e-06
+#Output13	0.0
+#Output14	8.254986411227208e-06
+#Output15	2.6628988423313575e-07
