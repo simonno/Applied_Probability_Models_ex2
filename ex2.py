@@ -10,21 +10,6 @@ from utils import words_splitter, get_words_list
 X = 300000
 
 
-#
-# def p_ho(event, training, held_out, unseen_events):
-#     r = training.get(event, 0)
-#     if r == 0:
-#         r_events = unseen_events
-#
-#     else:
-#         r_events = [event for event, count in training.items() if count == r]
-#
-#     tr = sum([count for event, count in held_out.items() if event in r_events])
-#     Nr = len(r_events)
-#     ho_size = sum(held_out.values())
-#     return tr / (ho_size * Nr)
-
-
 def p_lid(event, words_dict, lamb=0.0):
     return (words_dict.get(event, 0) + lamb) / (sum(words_dict.values()) + lamb * X)
 
@@ -82,7 +67,7 @@ def debug_lidstone(training):
 
 def lidstone_model_training(outputs, input_word, words_list):
     start_lid = datetime.now()
-    training, validation = words_splitter(words_list)
+    training, validation = words_splitter(words_list, 0.9)
     outputs.append(sum(validation.values()))
     outputs.append(sum(training.values()))
     outputs.append(len(training.keys()))
@@ -120,7 +105,7 @@ def write_outputs(outputs, output_filename):
 
 def held_out_model_training(outputs, input_word, words):
     start_ho = datetime.now()
-    held_out_model = HeldOutModel(words)
+    held_out_model = HeldOutModel(words, X)
     outputs.append(held_out_model.get_training_size())
     outputs.append(held_out_model.get_held_out_size())
     outputs.append(held_out_model.get_prob(input_word))
@@ -133,7 +118,7 @@ def held_out_model_training(outputs, input_word, words):
 def models_evaluation_on_test(outputs, test, lamb):
     test_dict, _ = words_splitter(test, 1.0)
     outputs.append(len(test))
-    outputs.append(perplexity())
+    # outputs.append(perplexity())
 
 
 def main(development_set_filename, test_set_filename, input_word, output_filename):
@@ -142,9 +127,9 @@ def main(development_set_filename, test_set_filename, input_word, output_filenam
     test = get_words_list(test_set_filename)
     init(outputs, development_set_filename, test_set_filename, input_word, output_filename)
     development_set_preprocessing(outputs, len(dev))
-    # lamb = lidstone_model_training(outputs, input_word, dev)
+    lamb = lidstone_model_training(outputs, input_word, dev)
     held_out_model_training(outputs, input_word, dev)
-    # models_evaluation_on_test(outputs, test, lamb)
+    models_evaluation_on_test(outputs, test, lamb)
 
     write_outputs(outputs, output_filename)
 
