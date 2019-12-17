@@ -20,6 +20,12 @@ class LidstoneModel:
     def get_training_size(self):
         return self.__training_size
 
+    def get_training_different_events(self):
+        return len(self.__training.keys())
+
+    def get_event_appearance(self, event):
+        return self.__training.get(event, 0)
+
     def get_validation_size(self):
         return self.__validation_size
 
@@ -41,12 +47,26 @@ class LidstoneModel:
     def get_prob(self, event, lamb):
         return self.__prob_dict[lamb][self.__training.get(event, 0)]
 
-    def get_min_perplexity(self):
-        min_perplexity = min(self.__perplexity_dict.values())
-        return min_perplexity, self.__perplexity_dict.pop()
+    def get_min_perplexity(self, start, stop, step):
+        min_perplexity = float(math.inf)
+        lamb = 0
+        curr_lamb = start
+        while curr_lamb <= stop:
+            curr_perplexity = self.get_perplexity(curr_lamb)
+            if curr_perplexity < min_perplexity:
+                min_perplexity = curr_perplexity
+                lamb = curr_lamb
+            curr_lamb += step
+
+        return min_perplexity, lamb
 
     def get_perplexity(self, lamb):
-        return self.__perplexity_dict[lamb]
+        if lamb in self.__perplexity_dict.keys():
+            return self.__perplexity_dict[lamb]
+        else:
+            perplexity = self.__calc_perplexity(lamb)
+            self.__perplexity_dict[lamb] = perplexity
+            return perplexity
 
     def __calc_prob(self, r, lamb):
         return (r + lamb) / (self.get_training_size() + lamb * self.__X)
@@ -65,8 +85,8 @@ class LidstoneModel:
         print('perplexity {0} - lambda {1} running time: {2}'.format(prep, lamb, datetime.now() - start_perp))
         return prep
 
-    def debug(self):
-        sum_p = self.get_prob('unseen-word') * self.__N0
+    def debug(self, lamb):
+        sum_p = self.get_prob('unseen-word', lamb) * (self.__X - self.get_training_different_events())
         for event in self.__training.keys():
-            sum_p += self.get_prob(event)
+            sum_p += self.get_prob(event, lamb)
         return sum_p

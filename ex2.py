@@ -5,6 +5,7 @@ from decimal import Decimal
 from random import randint
 
 from HeldOutModel import HeldOutModel
+from LidstoneModel import LidstoneModel
 from utils import words_splitter, get_words_list
 
 X = 300000
@@ -67,22 +68,23 @@ def debug_lidstone(training):
 
 def lidstone_model_training(outputs, input_word, words_list):
     start_lid = datetime.now()
-    training, validation = words_splitter(words_list, 0.9)
-    outputs.append(sum(validation.values()))
-    outputs.append(sum(training.values()))
-    outputs.append(len(training.keys()))
-    outputs.append(training.get(input_word, 0))
-    outputs.append(p_lid(input_word, training))
-    outputs.append(p_lid('unseen-word', training))
-    outputs.append(p_lid(input_word, training, 0.1))
-    outputs.append(p_lid('unseen-word', training, 0.1))
-    outputs.append(perplexity(training, validation, 0.01))
-    outputs.append(perplexity(training, validation, 0.1))
-    outputs.append(perplexity(training, validation, 1))
-    min_perplexity, lamb = get_min_perplexity(training, validation)
+    # training, validation = words_splitter(words_list, 0.9)
+    lidstone_model = LidstoneModel(words_list, X)
+    outputs.append(lidstone_model.get_validation_size())
+    outputs.append(lidstone_model.get_training_size())
+    outputs.append(lidstone_model.get_training_different_events())
+    outputs.append(lidstone_model.get_event_appearance(input_word))
+    outputs.append(lidstone_model.get_prob(input_word, Decimal('0.0')))
+    outputs.append(lidstone_model.get_prob('unseen-word', Decimal('0.0')))
+    outputs.append(lidstone_model.get_prob(input_word, Decimal('0.01')))
+    outputs.append(lidstone_model.get_prob('unseen-word', Decimal('0.1')))
+    outputs.append(lidstone_model.get_perplexity(Decimal('0.01')))
+    outputs.append(lidstone_model.get_perplexity(Decimal('0.1')))
+    outputs.append(lidstone_model.get_perplexity(Decimal('1')))
+    min_perplexity, lamb = lidstone_model.get_min_perplexity(Decimal('0.0'), Decimal('2.0'), Decimal('0.01'))
     outputs.append(lamb)
     outputs.append(min_perplexity)
-    print('Lidstone debug value: {0}'.format(debug_lidstone(training)))
+    print('Lidstone debug value: {0}'.format(lidstone_model.debug(Decimal('0.45'))))
     print('Lidstone running time: {0}'.format(datetime.now() - start_lid))
     return lamb
 
@@ -127,7 +129,7 @@ def main(development_set_filename, test_set_filename, input_word, output_filenam
     test = get_words_list(test_set_filename)
     init(outputs, development_set_filename, test_set_filename, input_word, output_filename)
     development_set_preprocessing(outputs, len(dev))
-    # lamb = lidstone_model_training(outputs, input_word, dev)
+    lamb = lidstone_model_training(outputs, input_word, dev)
     held_out_model_training(outputs, input_word, dev)
     # models_evaluation_on_test(outputs, test, lamb)
 
