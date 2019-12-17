@@ -21,9 +21,11 @@ class HeldOutModel:
         return self.__held_out_size
 
     def __create_prob_dict(self):
-        self.prob_dict = dict()
-        for r in range(0, max(self.__training.values()) + 1):
-            self.__calc_prob(r)
+        self.prob_dict = {0: self.__calc_prob(0)}
+        for r in self.__training.values():
+            if r in self.prob_dict.keys():
+                continue
+            self.prob_dict[r] = self.__calc_prob(r)
 
     def get_prob(self, event):
         return self.prob_dict[self.__training.get(event, 0)]
@@ -34,13 +36,11 @@ class HeldOutModel:
             Nr = self.__N0
         else:
             r_events = [event for event, count in self.__training.items() if count == r]
-            if len(r_events) == 0:
-                return
             Nr = len(r_events)
 
         tr = sum([count for event, count in self.__held_out.items() if event in r_events])
 
-        self.prob_dict[r] = tr / (self.__held_out_size * Nr)
+        return tr / (self.__held_out_size * Nr)
 
     def debug(self):
         sum_p = self.get_prob('unseen-word') * self.__N0

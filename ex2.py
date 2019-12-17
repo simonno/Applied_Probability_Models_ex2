@@ -127,9 +127,9 @@ def main(development_set_filename, test_set_filename, input_word, output_filenam
     test = get_words_list(test_set_filename)
     init(outputs, development_set_filename, test_set_filename, input_word, output_filename)
     development_set_preprocessing(outputs, len(dev))
-    lamb = lidstone_model_training(outputs, input_word, dev)
+    # lamb = lidstone_model_training(outputs, input_word, dev)
     held_out_model_training(outputs, input_word, dev)
-    models_evaluation_on_test(outputs, test, lamb)
+    # models_evaluation_on_test(outputs, test, lamb)
 
     write_outputs(outputs, output_filename)
 
