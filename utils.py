@@ -1,10 +1,3 @@
-def words_splitter(words_list, split):
-    split_index = round(split * len(words_list))
-    first_dict = create_counter_dict(words_list[:split_index])
-    second_dict = create_counter_dict(words_list[split_index:])
-    return first_dict, second_dict
-
-
 def create_counter_dict(words):
     counter_dict = dict()
     for word in words:
