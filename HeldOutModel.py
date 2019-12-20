@@ -48,7 +48,7 @@ class HeldOutModel:
                 sum_p = float(-math.inf)
                 break
             else:
-                sum_p += count * math.log(prob)
+                sum_p += count * math.log(prob, 2)
         return math.pow(2, -sum_p / self.get_test_size())
 
     def get_prob(self, event):
@@ -70,7 +70,7 @@ class HeldOutModel:
 
         tr = sum([count for event, count in self.__held_out.items() if event in r_events])
 
-        return tr / (self.__held_out_size * Nr), tr, Nr
+        return tr / (self.__held_out_size * Nr), Nr, tr
 
     def debug(self):
         sum_p = self.get_prob('unseen-word') * self.__N0

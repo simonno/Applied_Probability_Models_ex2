@@ -97,7 +97,7 @@ class LidstoneModel:
                 sum_p = float(-math.inf)
                 break
             else:
-                sum_p += count * math.log(prob)
+                sum_p += count * math.log(prob, 2)
         return math.pow(2, -sum_p / dataset_size)
 
     def debug(self, lamb):
